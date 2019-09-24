@@ -3,7 +3,9 @@ Automatically grab social media handles from website.
 Attempts to avoid other social media buttons etc on site (.e.g. sharing buttons, YouTube links, website builders)
 
 ## Installation
-
+```
+composer require cbanbury/social-handle-scraper
+```
 
 ## Example
 ```
