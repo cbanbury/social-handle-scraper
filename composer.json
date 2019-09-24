@@ -1,0 +1,21 @@
+{
+    "name": "cbanbury/social-handle-scraper",
+    "description": "Automatically grab social media handles from website",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Carl Banbury",
+            "email": "carl@banbury.ch"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "CBanbury\\SocialHandleScraper\\": "src/"
+        }
+    },
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "^8"
+    }
+}
