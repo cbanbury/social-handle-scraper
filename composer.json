@@ -14,7 +14,9 @@
             "CBanbury\\SocialHandleScraper\\": "src/"
         }
     },
-    "require": {},
+    "require": {
+        "chrome-php/chrome": "^0.6.0"
+    },
     "require-dev": {
         "phpunit/phpunit": "^8"
     }

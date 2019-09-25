@@ -3,6 +3,12 @@ Automatically grab social media handles from website.
 Attempts to avoid other social media buttons etc on site (.e.g. sharing buttons, YouTube links, website builders)
 
 ## Installation
+Requires `google-chrome` as an executable to scrape pages, on Ubuntu:
+
+```
+sudo apt install chromium-browser
+```
+Install with composer
 ```
 composer require cbanbury/social-handle-scraper
 ```

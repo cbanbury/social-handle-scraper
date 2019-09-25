@@ -2,20 +2,24 @@
 
 
 namespace CBanbury\SocialHandleScraper;
+use HeadlessChromium\BrowserFactory;
 
 class HandleScraper {
     private $valid;
-    private $xpath;
     private $supported = ['facebook', 'twitter', 'instagram'];
     private $data = [
-        'facebook' => null,
-        'twitter' => null,
-        'instagram' => null,
         'title' => null
     ];
+    private $candidates = [];
 
-    public function __construct() {
+    public function __construct($url) {
+        foreach($this->supported as $channel) {
+            $this->data[$channel] = null;
+            $this->candidates[$channel] = [];
+        }
+
         $this->valid = true;
+        $this->parse($url);
     }
 
     public function validDomain() {
@@ -27,80 +31,57 @@ class HandleScraper {
     }
 
     public function parse($url) {
-        $this->xpath = $this->clip($url);
+        $this->clip($url);
         foreach($this->supported as $channel) {
             $handle = $this->grabHandle($channel);
             $this->data[$channel] = $handle;
         }
-        $this->data['title'] = $this->grabTitle();
     }
 
     public function clip($target_url) {
-        $userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko)'.
-            ' Chrome/53.0.2785.116 Safari/537.36';
-
-        // make the cURL request to $target_url
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
-        curl_setopt($ch, CURLOPT_URL,$target_url);
-        curl_setopt($ch, CURLOPT_FAILONERROR, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_AUTOREFERER, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        $html= curl_exec($ch);
-
-        if (!$html) {
+        $browserFactory = new BrowserFactory('google-chrome');
+        $browser = $browserFactory->createBrowser();
+        $page = $browser->createPage();
+        $scheme = parse_url($target_url, PHP_URL_SCHEME);
+        if (empty($scheme)) $target_url = "http://$target_url";
+        try {
+            $page->navigate($target_url)->waitForNavigation();
+            $href = $page->evaluate('document.location.href')->getReturnValue();
+            if (!$href or $href === 'chrome-error://chromewebdata/') {
+                $this->valid = false;
+                $browser->close();
+                return;
+            }
+        } catch (OperationTimedOut $e) {
             $this->valid = false;
-            return null;
+            $browser->close();
+            return;
         }
 
-        // parse the html into a DOMDocument
-        $dom = new \DOMDocument();
-        @$dom->loadHTML($html);
+        foreach($this->supported as $channel) {
+            $this->candidates[$channel] = $page->evaluate($this->jsClosure($channel))->getReturnValue();
+        }
 
-        return $xpath = new \DOMXPath($dom);
+        $this->data['title'] = $page->evaluate('document.title')->getReturnValue();
+        $browser->close();
     }
 
-    public function grabTitle() {
-        $path = $this->xpath->query('//meta[@property="og:title"]/@content');
-
-        // prefer og:title
-        if (isset($path[0]) && isset($path[0]->value)) {
-            return $path[0]->value;
-        }
-
-        // fallback to <title> property
-        $path = $this->xpath->query('//title');
-
-        if (isset($path[0]) && isset($path[0]->textContent)) {
-            $title = $path[0]->textContent;
-            return $title;
-        }
-        return null;
+    private function jsClosure($search) {
+        return "(function (){a = []; document.querySelectorAll('a[href*=\"$search.com\"]').forEach((item)=>{a.push(item.href)}); return a;}())";
     }
 
     private function grabHandle($channel) {
-        $links = $this->xpath->query("//a[contains(@href, '$channel.com')]");
-        $handle = $this->walkLinks($links, 0, "$channel.com");
-        return $handle;
-    }
-
-    private function walkLinks($links, $index, $channel) {
-        if (isset($links[$index]) && strlen($links[$index]->getAttribute('href')) > 0 ) {
-            $candidate_path = $links[$index]->getAttribute('href');
-            $validator = new SocialHandleValidator($candidate_path);
+        $output = null;
+        foreach($this->candidates[$channel] as $link) {
+            $validator = new SocialHandleValidator($link);
             $result = $validator->validate($channel);
 
-            // recursive lookup
-            if (!$validator->valid()) {
-                if ($index === (count($links) -1)) {
-                    return null;
-                }
-                return $this->walkLinks($links, $index + 1, $channel);
+            if ($validator->valid()) {
+                $output = $result;
+                break;
             }
-
-            return $result;
         }
+
+        return $output;
     }
 }

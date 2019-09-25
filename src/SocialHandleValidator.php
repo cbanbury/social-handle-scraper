@@ -17,7 +17,7 @@ class SocialHandleValidator {
     }
 
     public function validate($channel) {
-        if ($channel !== 'facebook.com' && $channel !== 'instagram.com' && $channel !== 'twitter.com') {
+        if ($channel !== 'facebook' && $channel !== 'instagram' && $channel !== 'twitter') {
             return null;
         }
         $candidate_handle = $this->input;
@@ -40,7 +40,7 @@ class SocialHandleValidator {
         $candidate_handle = $parts[0];
 
         // facebook specific
-        if ($channel === 'facebook.com') {
+        if ($channel === 'facebook') {
             // convert /pages/{handle}/{id} to {id}
             if ($candidate_handle === 'pages') {
                 $parts = explode('/', $this->input);
@@ -60,7 +60,7 @@ class SocialHandleValidator {
         }
 
         // instagram specfic
-        if ($channel === 'instagram.com') {
+        if ($channel === 'instagram') {
             if ($candidate_handle === 'p') {
                 return null;
             }
