@@ -3,6 +3,7 @@
 
 namespace CBanbury\SocialHandleScraper;
 use HeadlessChromium\BrowserFactory;
+use HeadlessChromium\Exception\OperationTimedOut;
 
 class HandleScraper {
     private $valid;
@@ -42,7 +43,7 @@ class HandleScraper {
 
     public function clip($target_url) {
         $browserFactory = new BrowserFactory($this->chrome_exec);
-        $browser = $browserFactory->createBrowser();
+        $browser = $browserFactory->createBrowser(['noSandbox' => true]);
         $page = $browser->createPage();
         $scheme = parse_url($target_url, PHP_URL_SCHEME);
         if (empty($scheme)) $target_url = "http://$target_url";
@@ -57,6 +58,11 @@ class HandleScraper {
         } catch (OperationTimedOut $e) {
             $this->valid = false;
             $browser->close();
+            return;
+        } catch (\Exception $e) {
+            Log::error('unhandled exception');
+            Log::error($e->getMessage());
+            $this->valid = false;
             return;
         }
 
