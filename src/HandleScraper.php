@@ -6,18 +6,20 @@ use HeadlessChromium\BrowserFactory;
 
 class HandleScraper {
     private $valid;
+    private $chrome_exec;
     private $supported = ['facebook', 'twitter', 'instagram'];
     private $data = [
         'title' => null
     ];
     private $candidates = [];
 
-    public function __construct($url) {
+    public function __construct($url, $chrome_exec='chromium') {
         foreach($this->supported as $channel) {
             $this->data[$channel] = null;
             $this->candidates[$channel] = [];
         }
 
+        $this->chrome_exec = $chrome_exec;
         $this->valid = true;
         $this->parse($url);
     }
@@ -39,7 +41,7 @@ class HandleScraper {
     }
 
     public function clip($target_url) {
-        $browserFactory = new BrowserFactory('google-chrome');
+        $browserFactory = new BrowserFactory($this->chrome_exec);
         $browser = $browserFactory->createBrowser();
         $page = $browser->createPage();
         $scheme = parse_url($target_url, PHP_URL_SCHEME);

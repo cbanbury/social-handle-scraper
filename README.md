@@ -17,9 +17,9 @@ composer require cbanbury/social-handle-scraper
 ```
 use CBanbury\SocialHandleScraper\HandleScraper;
 
-$scraper = new HandleScraper();
-$url = 'example.com'
-$scraper->parse($url);
+$url = 'example.com';
+$chrome_exec = 'chromium';
+$scraper = new HandleScraper($url, $chrome_exec);
 $handles = $scraper->getHandles()
 
 --> 
