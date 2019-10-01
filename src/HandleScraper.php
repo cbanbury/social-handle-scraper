@@ -47,12 +47,22 @@ class HandleScraper {
         $page = $browser->createPage();
         $scheme = parse_url($target_url, PHP_URL_SCHEME);
         if (empty($scheme)) $target_url = "http://$target_url";
-
-        $page->navigate($target_url)->waitForNavigation();
-        $href = $page->evaluate('document.location.href')->getReturnValue();
-        if (!$href or $href === 'chrome-error://chromewebdata/') {
+        try {
+            $page->navigate($target_url)->waitForNavigation();
+            $href = $page->evaluate('document.location.href')->getReturnValue();
+            if (!$href or $href === 'chrome-error://chromewebdata/') {
+                $this->valid = false;
+                $browser->close();
+                return;
+            }
+        } catch (OperationTimedOut $e) {
             $this->valid = false;
             $browser->close();
+            return;
+        } catch (\Exception $e) {
+            Log::error('unhandled exception');
+            Log::error($e->getMessage());
+            $this->valid = false;
             return;
         }
 

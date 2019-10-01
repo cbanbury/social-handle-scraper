@@ -19,10 +19,7 @@ use CBanbury\SocialHandleScraper\HandleScraper;
 
 $url = 'example.com';
 $chrome_exec = 'chromium';
-try {
-    $scraper = new HandleScraper($url, $chrome_exec);
-}
-
+$scraper = new HandleScraper($url, $chrome_exec);
 $handles = $scraper->getHandles()
 
 --> 
