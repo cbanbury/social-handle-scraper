@@ -2,11 +2,13 @@
 Automatically grab social media handles from website.
 Attempts to avoid other social media buttons etc on site (.e.g. sharing buttons, YouTube links, website builders)
 
+Will use wget first to grab page content and fallback to using headless chromium browser.
+
 ## Installation
-Requires `google-chrome` as an executable to scrape pages, on Ubuntu:
+Requires `wget` and `chromium` as an executable to scrape pages, on Ubuntu:
 
 ```
-sudo apt install chromium-browser
+sudo apt install wget chromium-browser
 ```
 Install with composer
 ```
