@@ -77,7 +77,8 @@ class HandleScraper {
 
     public function clip($target_url) {
         $browserFactory = new BrowserFactory($this->chrome_exec);
-        $browser = $browserFactory->createBrowser(['noSandbox' => true]);
+        $browser = $browserFactory->createBrowser(['noSandbox' => true, 
+        'userAgent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36']);
         $page = $browser->createPage();
         $scheme = parse_url($target_url, PHP_URL_SCHEME);
         if (empty($scheme)) $target_url = "http://$target_url";

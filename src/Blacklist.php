@@ -12,5 +12,6 @@ return [
     'share',
     'sharer',
     '#',
-    '#!'
+    '#!',
+    'shopify'
 ];
