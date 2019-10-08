@@ -9,7 +9,7 @@ final class HandleGrabberTest extends TestCase
 {
     public function test_tesco_http()
     {
-        $scraper = new HandleScraper('http://tesco.com');
+        $scraper = new HandleScraper('tesco.com');
         $handles = $scraper->getHandles();
 
         $this->assertEquals(
@@ -49,7 +49,7 @@ final class HandleGrabberTest extends TestCase
         );
     }
 
-    public function test_only_junk_url()
+    public function test_junk_url()
     {
         $scraper = new HandleScraper('abdcabafjeweedsasd');
         $handles = $scraper->getHandles();
@@ -70,5 +70,21 @@ final class HandleGrabberTest extends TestCase
         );
 
         $this->assertEquals(false, $scraper->validDomain());
+    }
+
+    public function test_shopify_site()
+    {
+        $scraper = new HandleScraper('funanimalart.co.uk');
+        $handles = $scraper->getHandles();
+
+        $this->assertEquals(
+            'funanimalart',
+            $handles['facebook']
+        );
+
+        $this->assertEquals(
+            'funanimalart',
+            $handles['instagram']
+        );
     }
 }

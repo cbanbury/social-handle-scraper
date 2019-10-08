@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    working_dir: /var/www/app
+    volumes:
+      - ./:/var/www/app
+      - /var/www/app/vendor/
+      - /var/www/app/storage/logs/
