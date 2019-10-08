@@ -42,8 +42,15 @@ class HandleScraper {
     }
 
     public function fetch($target_url) {
-        shell_exec("wget -O - -q $target_url > /tmp/scrape.html");
+        shell_exec("wget -O - -q --timeout=20 --tries=1 $target_url > /tmp/scrape.html");
         $pageContent = file_get_contents('/tmp/scrape.html');
+
+        if (strlen($pageContent) < 1 or strpos($pageContent, 'FailedURI') !== false) {
+            // retry with www.
+            shell_exec("wget -O - -q --timeout=20 --tries=1 www.$target_url > /tmp/scrape.html");
+            $pageContent = file_get_contents('/tmp/scrape.html');
+        }
+
         $type = shell_exec("file /tmp/scrape.html");
 
         if (strpos($type, 'HTML') === false) {

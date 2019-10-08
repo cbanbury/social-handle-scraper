@@ -28,6 +28,27 @@ final class HandleGrabberTest extends TestCase
         );
     }
 
+    public function test_waitrose_http()
+    {
+        $scraper = new HandleScraper('waitrose.co.uk');
+        $handles = $scraper->getHandles();
+
+        $this->assertEquals(
+            'waitroseandpartners',
+            $handles['facebook']
+        );
+
+        $this->assertEquals(
+            'waitrose',
+            $handles['twitter']
+        );
+
+        $this->assertEquals(
+            'waitroseandpartners',
+            $handles['instagram']
+        );
+    }
+
     public function test_boots_without_http()
     {
         $scraper = new HandleScraper('boots.com');
