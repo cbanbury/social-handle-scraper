@@ -13,5 +13,7 @@ return [
     'sharer',
     '#',
     '#!',
-    'shopify'
+    'shopify',
+    '_https_',
+    'https:'
 ];
