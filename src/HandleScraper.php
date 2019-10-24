@@ -56,7 +56,6 @@ class HandleScraper {
         }
 
         if (strlen($pageContent) < 1 or strpos($pageContent, 'FailedURI') !== false) {
-            $this->clip($target_url);
             $this->valid = false;
             return;
         }
