@@ -7,20 +7,18 @@ use HeadlessChromium\Exception\OperationTimedOut;
 
 class HandleScraper {
     private $valid;
-    private $chrome_exec;
     private $supported = ['facebook', 'twitter', 'instagram'];
     private $data = [
         'title' => null
     ];
     private $candidates = [];
 
-    public function __construct($url, $chrome_exec='chromium') {
+    public function __construct($url) {
         foreach($this->supported as $channel) {
             $this->data[$channel] = null;
             $this->candidates[$channel] = [];
         }
 
-        $this->chrome_exec = $chrome_exec;
         $this->valid = true;
         $this->parse($url);
     }
@@ -59,6 +57,8 @@ class HandleScraper {
 
         if (strlen($pageContent) < 1 or strpos($pageContent, 'FailedURI') !== false) {
             $this->clip($target_url);
+            $this->valid = false;
+            return;
         }
 
         $dom = new \DOMDocument();
@@ -80,41 +80,6 @@ class HandleScraper {
             $title = $path[0]->textContent;
             $this->data['title'] = $title;
         }
-    }
-
-    public function clip($target_url) {
-        $browserFactory = new BrowserFactory($this->chrome_exec);
-        $browser = $browserFactory->createBrowser(['noSandbox' => true, 
-        'userAgent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36']);
-        $page = $browser->createPage();
-        $scheme = parse_url($target_url, PHP_URL_SCHEME);
-        if (empty($scheme)) $target_url = "http://$target_url";
-        try {
-            $page->navigate($target_url)->waitForNavigation();
-            $href = $page->evaluate('document.location.href')->getReturnValue();
-            if (!$href or $href === 'chrome-error://chromewebdata/') {
-                $this->valid = false;
-                $browser->close();
-                return;
-            }
-        } catch (OperationTimedOut $e) {
-            $this->valid = false;
-            return;
-        } catch (\Exception $e) {
-            $this->valid = false;
-            return;
-        }
-
-        foreach($this->supported as $channel) {
-            $this->candidates[$channel] = $page->evaluate($this->jsClosure($channel))->getReturnValue();
-        }
-
-        $this->data['title'] = $page->evaluate('document.title')->getReturnValue();
-        $browser->close();
-    }
-
-    private function jsClosure($search) {
-        return "(function (){a = []; document.querySelectorAll('a[href*=\"$search.com\"]').forEach((item)=>{a.push(item.href)}); return a;}())";
     }
 
     private function grabHandle($channel) {

@@ -2,26 +2,20 @@
 Automatically grab social media handles from website.
 Attempts to avoid other social media buttons etc on site (.e.g. sharing buttons, YouTube links, website builders)
 
-Will use wget first to grab page content and fallback to using headless chromium browser.
+Will use wget first to grab page content.
 
 ## Installation
-Requires `wget` and `chromium` as an executable to scrape pages, on Ubuntu:
+Requires `wget` as an executable to scrape pages, on Ubuntu:
 
 ```
 sudo apt install wget chromium-browser
-```
-Install with composer
-```
-composer require cbanbury/social-handle-scraper
-```
 
 ## Example
 ```
 use CBanbury\SocialHandleScraper\HandleScraper;
 
 $url = 'example.com';
-$chrome_exec = 'chromium';
-$scraper = new HandleScraper($url, $chrome_exec);
+$scraper = new HandleScraper($url);
 $handles = $scraper->getHandles()
 
 --> 
