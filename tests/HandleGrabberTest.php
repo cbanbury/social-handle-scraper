@@ -108,4 +108,12 @@ final class HandleGrabberTest extends TestCase
             $handles['instagram']
         );
     }
+
+    public function test_blacklist_facebook_domain()
+    {
+        $scraper = new HandleScraper('facebook.com/foo');
+        $handles = $scraper->getHandles();
+
+        $this->assertEquals($scraper->validDomain(), false);
+    }
 }

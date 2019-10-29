@@ -2,8 +2,6 @@
 
 
 namespace CBanbury\SocialHandleScraper;
-use HeadlessChromium\BrowserFactory;
-use HeadlessChromium\Exception\OperationTimedOut;
 
 class HandleScraper {
     private $valid;
@@ -20,6 +18,15 @@ class HandleScraper {
         }
 
         $this->valid = true;
+        $url = Domain::get($url);
+        if (strlen($url) < 1) {
+            $this->valid = false;
+        }
+
+        if (Domain::isBlacklisted($url)) {
+            $this->valid = false;
+        }
+
         $this->parse($url);
     }
 
@@ -32,10 +39,12 @@ class HandleScraper {
     }
 
     public function parse($url) {
-        $this->fetch($url);
-        foreach($this->supported as $channel) {
-            $handle = $this->grabHandle($channel);
-            $this->data[$channel] = $handle;
+        if ($this->valid) {
+            $this->fetch($url);
+            foreach($this->supported as $channel) {
+                $handle = $this->grabHandle($channel);
+                $this->data[$channel] = $handle;
+            }
         }
     }
 
@@ -52,7 +61,7 @@ class HandleScraper {
         $type = shell_exec("file /tmp/scrape.html");
 
         if (strpos($type, 'HTML') === false) {
-            $pageContent= shell_exec('zcat /tmp/scrape.html');
+            $pageContent= shell_exec('zcat /tmp/scrape.html 2>/dev/null');
         }
 
         if (strlen($pageContent) < 1 or strpos($pageContent, 'FailedURI') !== false) {
