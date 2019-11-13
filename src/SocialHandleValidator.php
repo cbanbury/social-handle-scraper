@@ -85,6 +85,23 @@ class SocialHandleValidator {
         if (preg_match('/\.php/', $candidate_handle) > 0) {
             return null;
         }
+        
+        // twitter specifc
+        if ($channel === 'twitter') {
+            if ($candidate_handle === 'intent') {
+                try {
+                    $query = parse_url($this->input, PHP_URL_QUERY);
+                    parse_str($query, $params);
+                } catch (\Exception $e) {
+                    return null;
+                }
+                
+                if (!isset($params['screen_name'])) {
+                    return null;
+                }
+                $candidate_handle = $params['screen_name'];
+            }
+        }
 
         $final = strtolower($candidate_handle);
         if (in_array($final, $this->blacklist)) {

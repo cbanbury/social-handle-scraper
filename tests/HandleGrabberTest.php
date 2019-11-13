@@ -116,4 +116,15 @@ final class HandleGrabberTest extends TestCase
 
         $this->assertEquals($scraper->validDomain(), false);
     }
+    
+    public function test_intent_url()
+    {
+        $scraper = new HandleScraper('www.eberhardt-travel.de');
+        $handles = $scraper->getHandles();
+        
+        $this->assertEquals(
+            'richtig_reisen',
+            $handles['twitter']
+        );
+    }
 }
