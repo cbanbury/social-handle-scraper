@@ -15,5 +15,8 @@ return [
     '#!',
     'shopify',
     '_https_',
-    'https:'
+    'https:',
+    'http:',
+    'hashtag',
+    'wordpress'
 ];
