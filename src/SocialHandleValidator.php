@@ -46,6 +46,11 @@ class SocialHandleValidator {
                 $parts = explode('/', $this->input);
                 $candidate_handle = $parts[count($parts)-1];
             }
+            
+            // pg format -> should never reach this line, fallback measure
+            if ($candidate_handle === 'pg') {
+                return null;
+            }
 
             // profile.php?id={id} format
             $profileId = explode('profile.php?id=', $candidate_handle);
@@ -71,6 +76,11 @@ class SocialHandleValidator {
 
             // remove explore to instagram
             if ($candidate_handle === 'explore') {
+                return null;
+            }
+            
+            // instagram images
+            if (strpos($this->input, 'cdninstagram') !== false) {
                 return null;
             }
         }

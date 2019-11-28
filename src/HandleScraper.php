@@ -26,7 +26,7 @@ class HandleScraper {
         if (Domain::isBlacklisted($url)) {
             $this->valid = false;
         }
-
+        
         $this->parse($url);
     }
 
