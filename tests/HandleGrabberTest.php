@@ -127,4 +127,15 @@ final class HandleGrabberTest extends TestCase
             $handles['twitter']
         );
     }
+    
+    public function test_amazon_redirect()
+    {
+        $scraper = new HandleScraper('jdlandis.com');
+        $handles = $scraper->getHandles();
+        
+        $this->assertEquals(
+            null,
+            $handles['facebook']
+        );
+    }
 }

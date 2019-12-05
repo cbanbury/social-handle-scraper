@@ -21,6 +21,16 @@ class SocialHandleValidator {
             return null;
         }
         $candidate_handle = $this->input;
+        
+        // check $channel not in query params
+        $params = explode('?', $candidate_handle);
+        if (count($params) > 1) {
+            $temp = $params[0];
+            // var_dump(strpos($channel, $temp));
+            if (strpos($temp, $channel) === false) {
+                return null;
+            }
+        }
 
         // remove @ prefix
         $candidate_handle = preg_replace('/^@/', '', $candidate_handle);
