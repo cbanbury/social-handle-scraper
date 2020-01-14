@@ -18,5 +18,6 @@ return [
     'https:',
     'http:',
     'hashtag',
-    'wordpress'
+    'wordpress',
+    'search'
 ];

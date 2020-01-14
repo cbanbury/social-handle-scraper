@@ -138,4 +138,15 @@ final class HandleGrabberTest extends TestCase
             $handles['facebook']
         );
     }
+
+    public function test_at_prefix_removed()
+    {
+        $scraper = new HandleScraper('number10.gov.uk');
+        $handles = $scraper->getHandles();
+        
+        $this->assertEquals(
+            '10downingstreet',
+            $handles['twitter']
+        );
+    }
 }

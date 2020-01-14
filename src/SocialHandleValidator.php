@@ -32,9 +32,6 @@ class SocialHandleValidator {
             }
         }
 
-        // remove @ prefix
-        $candidate_handle = preg_replace('/^@/', '', $candidate_handle);
-
         // remove m.facebook.com, www.facebook.com etc prefix
         $parts = explode('.com/', $candidate_handle);
 
@@ -122,6 +119,9 @@ class SocialHandleValidator {
                 $candidate_handle = $params['screen_name'];
             }
         }
+
+        // remove @ prefix
+        $candidate_handle = preg_replace('/^@/', '', $candidate_handle);
 
         $final = strtolower($candidate_handle);
         if (in_array($final, $this->blacklist)) {
