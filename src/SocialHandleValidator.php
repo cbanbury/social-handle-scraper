@@ -119,7 +119,7 @@ class SocialHandleValidator {
                 $candidate_handle = $params['screen_name'];
             }
 
-            if (!preg_match('/^[A-Za-z0-9_]{1,15}$/', trim($username))) {
+            if (!preg_match('/^[A-Za-z0-9_]{1,15}$/', trim($candidate_handle))) {
                 return null;
             }
         }
