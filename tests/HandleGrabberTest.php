@@ -149,4 +149,26 @@ final class HandleGrabberTest extends TestCase
             $handles['twitter']
         );
     }
+
+    public function test_email()
+    {
+        $scraper = new HandleScraper('modainpelle.com');
+        $handles = $scraper->getHandles();
+
+        $this->assertEquals(
+            'customerservices@modainpelle.com',
+            $handles['email']
+        );
+    }
+
+    public function test_terms_email() 
+    {
+        $scraper = new HandleScraper('boohoo.com');
+        $handles = $scraper->getHandles();
+
+        $this->assertEquals(
+            'customerservcies@boohoo.com',
+            $handles['email']
+        );
+    }
 }
