@@ -70,10 +70,10 @@ class HandleScraper {
         $email = $this->grabEmail($xpath);
 
         if (!$email) {
-            foreach(array('contact', 'about') as $check) {
-                $contactPage = $this->getPage($xpath, $check);
+            foreach(array('contact', 'about', 'terms', 'privacy') as $check) {
+                $contactPage = $this->getPage($xpath, $check, $target_url);
                 if ($contactPage) {
-                    $email = $this->grabEmail($contactPage);
+                    $email = $this->grabEmailFallback($contactPage);
                 }
                 
                 if ($email) {
@@ -81,9 +81,6 @@ class HandleScraper {
                 }
             }
         }
-
-        // fallback to using terms and conditions page
-        $email = $this->grabEmailFallback($xpath);
 
         $this->data['email'] = str_replace('mailto:', '', $email);
 
@@ -93,18 +90,19 @@ class HandleScraper {
         }
     }
 
-    private function grabEmailFallback($xpath) {
-        // find terms/conditions page
-        $terms = $this->getPage($xpath, 'terms');
-        if (!$terms) {
-            $terms = $this->getPage($xpath, 'privacy');
-        }
-
-        if (!$terms) {
+    private function grabEmailFallback($page) {
+        if (!$page) {
             return null;
         }
 
-        $email = $terms->query("//p[contains(text(), '@')]");
+        $email = $this->grabEmail($page);
+
+        if ($email) {
+            return $email;
+        }
+
+        // as a last resort, try to find email address in the text
+        $email = $page->query("//p[contains(text(), '@')]");
 
         if (count($email) > 0) {
             $text = $email[0]->textContent;
@@ -113,8 +111,12 @@ class HandleScraper {
                 $name = explode(' ', $parts[0]);
                 $domain = explode(' ', $parts[1]);
                 $email = trim(end($name) . '@' . $domain[0]);
-                var_dump($email);
-                return trim($email, '.');
+                $email = trim($email, '.');
+                if (strlen($email) < 2) {
+                    return null;
+                }
+
+                return $email;
             }
             
         }
@@ -123,7 +125,7 @@ class HandleScraper {
     }
 
     private function grabEmail($xpath) {
-        $email = $xpath->query("//a[contains(@href, 'mailto')]");
+        $email = $xpath->query("//a[contains(@href, 'mailto')]");#
 
         if (count($email) > 0) {
             return $email[0]->getAttribute('href');
@@ -147,17 +149,16 @@ class HandleScraper {
         return $output;
     }
 
-    private function getPage($xpath, $search) {
+    private function getPage($xpath, $search, $home) {
         $pages = $xpath->query("//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '$search')]");
-
-        // TODO: how to handle relative urls! :(
-        // foreach($pages as $page) {
-        //     var_dump($page->getAttribute('href'));
-        // }
         
         if (count($pages) > 0) {
-            
-            return $this->getContent($pages[0]->getAttribute('href'));
+            $link = $pages[0]->getAttribute('href');
+
+            if (substr($link, 0, 4 ) !== "http") {
+                $link = $home . '/' . trim($link, '/');
+            }
+            return $this->getContent($link);
         }
 
         return null;

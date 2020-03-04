@@ -171,4 +171,26 @@ final class HandleGrabberTest extends TestCase
             $handles['email']
         );
     }
+
+    public function test_get_email_from_mailto_on_privacy_page()
+    {
+        $scraper = new HandleScraper('www.bravissimo.com');
+        $handles = $scraper->getHandles();
+
+        $this->assertEquals(
+            'customer.services@bravissimo.com',
+            $handles['email']
+        );
+    }
+
+    public function test_get_email_from_difficult_shop()
+    {
+        $scraper = new HandleScraper('www.wiggle.co.uk');
+        $handles = $scraper->getHandles();
+
+        $this->assertEquals(
+            'support@wiggle.co.uk',
+            $handles['email']
+        );
+    }
 }
