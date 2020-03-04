@@ -11,10 +11,15 @@ class HandleScraper {
     ];
     private $candidates = [];
 
-    public function __construct($url) {
+    public function __construct($url, $emails=false) {
         foreach($this->supported as $channel) {
             $this->data[$channel] = null;
             $this->candidates[$channel] = [];
+        }
+
+        $this->fetchEmails = false;
+        if ($emails) {
+            $this->fetchEmails = true;
         }
 
         $this->valid = true;
@@ -67,26 +72,24 @@ class HandleScraper {
         }
 
         $path = $xpath->query('//title');
-        $email = $this->grabEmail($xpath);
-
-        if (!$email) {
-            foreach(array('contact', 'about', 'terms', 'privacy') as $check) {
-                $contactPage = $this->getPage($xpath, $check, $target_url);
-                if ($contactPage) {
-                    $email = $this->grabEmailFallback($contactPage);
-                }
-                
-                if ($email) {
-                    break;
-                }
-            }
-        }
-
-        $this->data['email'] = str_replace('mailto:', '', $email);
 
         if (isset($path[0]) && isset($path[0]->textContent)) {
             $title = $path[0]->textContent;
             $this->data['title'] = $title;
+        }
+
+        if ($this->fetchEmails) {
+            $emails = [];
+            array_push($emails, $this->grabEmail($xpath));
+
+            foreach(array('contact', 'about', 'terms', 'privacy') as $check) {
+                $pages = $this->getPages($xpath, $check, $target_url);
+                foreach($pages as $page) {
+                    array_push($emails, $this->grabEmailFallback($page));
+                }
+            }
+
+            $this->data['emails'] = array_filter(array_unique($emails));
         }
     }
 
@@ -116,7 +119,8 @@ class HandleScraper {
                     return null;
                 }
 
-                return $email;
+                $email = $this->removeAlias($email);
+                return str_replace('mailto:', '', $email);
             }
             
         }
@@ -128,7 +132,8 @@ class HandleScraper {
         $email = $xpath->query("//a[contains(@href, 'mailto')]");#
 
         if (count($email) > 0) {
-            return $email[0]->getAttribute('href');
+            $email = $this->removeAlias($email[0]->getAttribute('href'));
+            return str_replace('mailto:', '', $email);
         }
 
         return null;
@@ -149,19 +154,21 @@ class HandleScraper {
         return $output;
     }
 
-    private function getPage($xpath, $search, $home) {
+    private function getPages($xpath, $search, $home) {
         $pages = $xpath->query("//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '$search')]");
         
-        if (count($pages) > 0) {
-            $link = $pages[0]->getAttribute('href');
+        $out = [];
+        foreach($pages as $page) {
+            $link = $page->getAttribute('href');
 
             if (substr($link, 0, 4 ) !== "http") {
                 $link = $home . '/' . trim($link, '/');
             }
-            return $this->getContent($link);
+
+            array_push($out, $this->getContent($link));
         }
 
-        return null;
+        return $out;
     }
 
     private function getContent($url) {
@@ -187,5 +194,23 @@ class HandleScraper {
         $dom = new \DOMDocument();
         @$dom->loadHTML($pageContent);
         return new \DOMXPath($dom);
+    }
+
+    private function removeAlias($email) {
+        $parts = explode('+', $email);
+
+        if (count($parts) !== 2) {
+            return $email;
+        }
+
+        $prefix = $parts[0];
+
+        // +foobar@gmail.com
+        $domain = explode('@', $parts[1]);
+        if (count($domain) === 2) {
+            return $prefix . '@' . $domain[1];
+        }
+
+        return $email;
     }
 }

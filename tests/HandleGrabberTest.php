@@ -152,45 +152,45 @@ final class HandleGrabberTest extends TestCase
 
     public function test_email()
     {
-        $scraper = new HandleScraper('modainpelle.com');
+        $scraper = new HandleScraper('modainpelle.com', true);
         $handles = $scraper->getHandles();
 
         $this->assertEquals(
-            'customerservices@modainpelle.com',
-            $handles['email']
+            in_array('customerservices@modainpelle.com',
+            $handles['emails']), true
         );
     }
 
     public function test_terms_email() 
     {
-        $scraper = new HandleScraper('boohoo.com');
+        $scraper = new HandleScraper('boohoo.com', true);
         $handles = $scraper->getHandles();
 
         $this->assertEquals(
-            'customerservcies@boohoo.com',
-            $handles['email']
+            in_array('customerservcies@boohoo.com',
+            $handles['emails']), true
         );
     }
 
     public function test_get_email_from_mailto_on_privacy_page()
     {
-        $scraper = new HandleScraper('www.bravissimo.com');
+        $scraper = new HandleScraper('www.bravissimo.com', true);
         $handles = $scraper->getHandles();
 
         $this->assertEquals(
-            'customer.services@bravissimo.com',
-            $handles['email']
+            in_array('customer.services@bravissimo.com',
+            $handles['emails']), true
         );
     }
 
     public function test_get_email_from_difficult_shop()
     {
-        $scraper = new HandleScraper('www.wiggle.co.uk');
+        $scraper = new HandleScraper('www.wiggle.co.uk', true);
         $handles = $scraper->getHandles();
-
+        
         $this->assertEquals(
-            'support@wiggle.co.uk',
-            $handles['email']
+            in_array('support@wiggle.co.uk',
+            $handles['emails']), true
         );
     }
 }
