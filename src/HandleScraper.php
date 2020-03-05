@@ -89,7 +89,7 @@ class HandleScraper {
                 }
             }
 
-            $this->data['emails'] = array_filter(array_unique($emails));
+            $this->data['emails'] = array_values(array_filter(array_unique($emails)));
         }
     }
 
