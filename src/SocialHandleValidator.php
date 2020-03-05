@@ -102,6 +102,9 @@ class SocialHandleValidator {
         if (preg_match('/\.php/', $candidate_handle) > 0) {
             return null;
         }
+
+        // remove @ prefix
+        $candidate_handle = preg_replace('/^@/', '', $candidate_handle);
         
         // twitter specifc
         if ($channel === 'twitter') {
