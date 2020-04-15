@@ -69,20 +69,17 @@ class SocialHandleValidator {
             if ($candidate_handle === 'groups') {
                 return null;
             }
+
+            $fb_blacklist = array('events', 'www.facebook');
+            if (in_array($candidate_handle, $fb_blacklist)) {
+                return null;
+            }
         }
 
         // instagram specfic
         if ($channel === 'instagram') {
-            if ($candidate_handle === 'p') {
-                return null;
-            }
-
-            if ($candidate_handle === 'user') {
-                return null;
-            }
-
-            // remove explore to instagram
-            if ($candidate_handle === 'explore') {
+            $insta_blacklist = array('p', 'user', 'explore');
+            if (in_array($candidate_handle, $insta_blacklist)) {
                 return null;
             }
             
@@ -108,6 +105,11 @@ class SocialHandleValidator {
         
         // twitter specifc
         if ($channel === 'twitter') {
+            $twit_blacklist = array('home', 'i', 'twitterapi', 'statuses', 'login');
+            if (in_array($candidate_handle, $twit_blacklist)) {
+                return null;
+            }
+
             if ($candidate_handle === 'intent') {
                 try {
                     $query = parse_url($this->input, PHP_URL_QUERY);

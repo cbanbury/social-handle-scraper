@@ -193,4 +193,12 @@ final class HandleGrabberTest extends TestCase
             $handles['emails']), true
         );
     }
+
+    public function test_google_sites()
+    {
+        $scraper = new HandleScraper('https://sites.google.com/site/tendringwadokai', true);
+        $valid = $scraper->validDomain();
+        
+        $this->assertEquals($valid, true);
+    }
 }

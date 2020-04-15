@@ -19,5 +19,8 @@ return [
     'http:',
     'hashtag',
     'wordpress',
-    'search'
+    'wordpressdotcom',
+    'search',
+    'bitly',
+    'home'
 ];
