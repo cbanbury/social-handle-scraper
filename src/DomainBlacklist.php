@@ -4,5 +4,8 @@ return [
     'facebook',
     'twitter',
     'instagram',
-    'google'
+    'google',
+    'maybetech',
+    'a.co',
+    'amazon'
 ];

@@ -46,6 +46,11 @@ class SocialHandleValidator {
         }
         $candidate_handle = $parts[0];
 
+        // remove #'s as prefix or tags
+        $candidate_handle = trim($candidate_handle, '#');
+        $candidate_handle = explode('#', $candidate_handle);
+        $candidate_handle = $candidate_handle[0];
+
         // facebook specific
         if ($channel === 'facebook') {
             // convert /pages/{handle}/{id} to {id}

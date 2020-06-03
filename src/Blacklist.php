@@ -22,6 +22,5 @@ return [
     'wordpressdotcom',
     'search',
     'bitly',
-    'home',
-    'maybetech'
+    'home'
 ];
